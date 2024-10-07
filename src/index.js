@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const taskList = document.getElementById('taskList');
   
     let tasks = [];
+    let sortOrder = 'asc';
   
     taskForm.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -67,6 +68,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sortDesc').addEventListener('click', () => {
         tasks.sort((a, b) => b.priority.localeCompare(a.priority));
         renderTasks();
+        sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+        renderTasks();erR
     });
   });
+  
+  
   

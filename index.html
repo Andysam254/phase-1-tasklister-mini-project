@@ -11,6 +11,7 @@
         .task { display: flex; justify-content: space-between; align-items: center; }
         .task-buttons { display: flex; gap: 5px; }
     </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <h1>To-Do List</h1>
@@ -26,9 +27,13 @@
         </select>
         <button type="submit">Add Task</button>
     </form>
+
+    <div>
+        <h2>My todos:</h2>
     <ul id="taskList"></ul>
     <button id="sortAsc">Sort Ascending</button>
     <button id="sortDesc">Sort Descending</button>
+    </div>
 
     <script src="script.js"></script>
 </body>
