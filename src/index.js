@@ -1,77 +1,108 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const taskForm = document.getElementById('taskForm');
-    const taskInput = document.getElementById('taskInput');
-    const userInput = document.getElementById('userInput');
-    const durationInput = document.getElementById('durationInput');
-    const dateInput = document.getElementById('dateInput');
-    const priorityInput = document.getElementById('priorityInput');
-    const taskList = document.getElementById('taskList');
-  
-    let tasks = [];
-    let sortOrder = 'asc';
-  
-    taskForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        
-        const task = {
-            id: Date.now(),
-            text: taskInput.value,
-            user: userInput.value,
-            duration: durationInput.value,
-            date: dateInput.value,
-            priority: priorityInput.value,
-        };
-  
-        tasks.push(task);
-        renderTasks();
-        taskForm.reset();
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("#create-task-form");
+    const sortSelect = document.querySelector("#sort-tasks");
+    let tasks = []; // Array to hold all tasks
+
+    // Add event listener for form submission
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      
+      // Get values from the form
+      const taskDescription = document.querySelector("#new-task-description").value.trim();
+      const taskUser = document.querySelector("#task-user").value.trim();
+      const taskDuration = document.querySelector("#task-duration").value.trim();
+      const taskDueDate = document.querySelector("#task-due-date").value;
+      const taskPriority = document.querySelector("#task-priority").value;
+
+      // Simple validation: Ensure all fields are filled
+      if (!taskDescription || !taskUser || !taskDuration || !taskDueDate || !taskPriority) {
+        alert("All fields are required!");
+        return;
+      }
+
+      // Create task object
+      const task = {
+        description: taskDescription,
+        user: taskUser,
+        duration: taskDuration,
+        dueDate: taskDueDate,
+        priority: taskPriority
+      };
+
+      // Add task to task array
+      tasks.push(task);
+      
+      // Display tasks
+      displayTasks(tasks);
+      
+      // Reset form after submission
+      form.reset();
     });
-  
-    function renderTasks() {
-        taskList.innerHTML = '';
-        tasks.forEach(task => {
-            const li = document.createElement('li');
-            li.classList.add('task', task.priority);
-            li.innerHTML = `
-                <span>${task.text} (User: ${task.user}, Duration: ${task.duration}, Due: ${task.date})</span>
-                <div class="task-buttons">
-                    <button onclick="editTask(${task.id})">Edit</button>
-                    <button onclick="deleteTask(${task.id})">Delete</button>
-                </div>
-            `;
-            taskList.appendChild(li);
-        });
-    }
-  
-    window.deleteTask = function(id) {
-        tasks = tasks.filter(task => task.id !== id);
-        renderTasks();
-    };
-  
-    window.editTask = function(id) {
-        const task = tasks.find(task => task.id === id);
-        if (task) {
-            taskInput.value = task.text;
-            userInput.value = task.user;
-            durationInput.value = task.duration;
-            dateInput.value = task.date;
-            priorityInput.value = task.priority;
-            deleteTask(id); // Remove the task before re-adding it
+
+    // Listen for changes in the sort dropdown
+    sortSelect.addEventListener("change", function() {
+      displayTasks(tasks);
+    });
+
+    // Function to display tasks
+    function displayTasks(taskList) {
+      const taskListElement = document.querySelector("#tasks");
+      taskListElement.innerHTML = ""; // Clear existing tasks
+
+      // Sort tasks based on the selected sorting option
+      const sortOrder = sortSelect.value;
+      const sortedTasks = [...taskList]; // Make a copy of the task array to sort
+
+      // Priority mapping for sorting
+      const priorityMap = {
+        high: 1,
+        medium: 2,
+        low: 3
+      };
+
+      // Sort tasks by priority (ascending or descending)
+      if (sortOrder === "ascending") {
+        sortedTasks.sort((a, b) => priorityMap[a.priority.toLowerCase()] - priorityMap[b.priority.toLowerCase()]);
+      } else if (sortOrder === "descending") {
+        sortedTasks.sort((a, b) => priorityMap[b.priority.toLowerCase()] - priorityMap[a.priority.toLowerCase()]);
+      }
+
+      // Create task elements and append to list
+      sortedTasks.forEach(task => {
+        const newTask = document.createElement("li");
+        newTask.innerHTML = `
+          <strong>Description:</strong> ${task.description} <br>
+          <strong>User:</strong> ${task.user} <br>
+          <strong>Duration:</strong> ${task.duration} <br>
+          <strong>Due Date:</strong> ${task.dueDate} <br>
+          <strong>Priority:</strong> ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+        `;
+
+        // Color-code tasks based on priority
+        switch (task.priority.toLowerCase()) {
+          case "high":
+            newTask.style.color = "red";
+            break;
+          case "medium":
+            newTask.style.color = "green";
+            break;
+          case "low":
+            newTask.style.color = "blue";
+            break;
+          default:
+            newTask.style.color = "black";
         }
-    };
-  
-    document.getElementById('sortAsc').addEventListener('click', () => {
-        tasks.sort((a, b) => a.priority.localeCompare(b.priority));
-        renderTasks();
-    });
-  
-    document.getElementById('sortDesc').addEventListener('click', () => {
-        tasks.sort((a, b) => b.priority.localeCompare(a.priority));
-        renderTasks();
-        sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-        renderTasks();erR
-    });
-  });
-  
-  
-  
+
+        // Create delete button for each task
+        const deleteButton = document.createElement("button");
+        deleteButton.innerText = "Delete";
+        deleteButton.addEventListener("click", function() {
+          tasks = tasks.filter(t => t !== task); // Remove task from array
+          displayTasks(tasks); // Update the task display
+        });
+
+        newTask.appendChild(deleteButton);
+        taskListElement.appendChild(newTask);
+      });
+    }
+});
